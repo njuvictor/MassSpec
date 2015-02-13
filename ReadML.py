@@ -36,31 +36,67 @@ def PlotRange(run):
         p.save( filename="output/plotAspect.xhtml")
         break
 
+class SpecBasic:
+    def __init__(self, rt, index):
+        self._rt = rt
+        self._idx = index
+
+    @property
+    def rtime(self, rtime):
+        self_rt = rtime
+
+    @property
+    def index(self, index):
+        self._idx = index
+
+    def __str__(self):
+        return "retention time: %s, index: %s" %(self._rt, self._idx)
+
+def SpecDict:
+    def __init__(self):
+
+def setup(filename):
+    # set up basic data structure
+    run = pymzml.run.Reader(filename)
+    speclist = []
+    for spectrum in run:
+        if spectrum['ms level'] == 1:
+            speclist.append(SpecBasic(spectrum['scan time'], spectrum['id']))
+    return speclist
+
+def ExtractIonChromWithTime(run, time):
+
+
 def ExtractIonChrom(run):
     timeDependentIntensities = []
     #MASS_2_FOLLOW = 1402
     MASS_2_FOLLOW = 1403
     print "mass 2 follow:", MASS_2_FOLLOW
     for spectrum in run:
-        if spectrum['ms level'] == 1:
-            matchList = spectrum.hasPeak(MASS_2_FOLLOW)
-            if matchList != []:
-                print "matched"
-                for mz,I in matchList:
-                    if I > 100:
-                        timeDependentIntensities.append( [ spectrum['scan time'], I , mz ])
+        print spectrum['id']
+    #for spectrum in run:
+    #    if spectrum['ms level'] == 1:
+    #        matchList = spectrum.hasPeak(MASS_2_FOLLOW)
+    #        if matchList != []:
+    #            print "matched"
+    #            for mz,I in matchList:
+    #                if I > 100:
+    #                    timeDependentIntensities.append( [ spectrum['scan time'], I , mz ])
     for rt, i, mz in timeDependentIntensities:
         print('{0:5.3f} {1:13.4f}       {2:10}'.format( rt, i, mz ))
 
 
-if __name__ == "__main__":
+def examples():
+    pass
     # first example
     #run = pymzml.run.Reader("../E165ug.mzML", MSn_Precision = 250e-6)
     #GetPeakbyMZRange(run, (1293.0, 1293.5))
     # second example
     #run = pymzml.run.Reader("../4tRNA1_102009.mzML", MSn_Precision = 250e-6)
     #GetPeakbyMZRange(run, (1402.0, 1402.5))
-    run = pymzml.run.Reader("./4tRNA1_102009.mzML", MSn_Precision = 250e-6)
+    #run = pymzml.run.Reader("./4tRNA1_102009.mzML", MSn_Precision = 250e-6)
     #GetNPeakbyMZRange(run, (1403.0, 1403.3))
-    # hasPeak
-    ExtractIonChrom(run)
+    #ExtractIonChrom(run)
+
+if __name__ == "__main__":
+    setup("./4tRNA1_102009.mzML")

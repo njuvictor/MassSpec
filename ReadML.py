@@ -38,7 +38,8 @@ def PlotRange(run):
 
 class SpecBasic:
     def __init__(self, rt, index):
-        self._rt = rt
+        # here the program assume the retention time is a float number
+        self._rt = float(rt)
         self._idx = index
 
     @property
@@ -52,11 +53,18 @@ class SpecBasic:
     def __str__(self):
         return "retention time: %s, index: %s" %(self._rt, self._idx)
 
-def SpecDict(dict):
-    def __init__(self):
-        pass
+class SpecDict(dict):
     def __getattr__(self, time):
-        for self[int(time)]
+        if time.is_integer():
+            return self[int(time)]
+        else:
+            matchlist = []
+            dec_len = len(str(time).split(".")[-1])
+            for specbasic in self[int(time)]:
+                if (specbasic.rtime - time) * 10 ** dec_len // 1 == 0:
+                    matchlist.append(specbasic)
+            return matchlist
+
 
     def __setattr__(self, time, specbasic):
         if not isinstance(specbasic, SpecBasic):
@@ -66,16 +74,27 @@ def SpecDict(dict):
         except:
             self[int(time)] = [specbasic]
 
-def setup(filename):
-    # set up basic data structure
-    run = pymzml.run.Reader(filename)
-    speclist = []
-    for spectrum in run:
-        if spectrum['ms level'] == 1:
-            speclist.append(SpecBasic(spectrum['scan time'], spectrum['id']))
-    return speclist
+    def __str__(self):
+        return "number of spec: %s" % (len(self.keys()))
 
-def ExtractIonChromWithTime(run, time):
+class ExtractSpec:
+    def __init__(self, filename):
+        self.run, self.specdict = self.setup(filename)
+        print self.specdict
+
+    def setup(self, filename):
+        # set up basic data structure
+        run = pymzml.run.Reader(filename)
+        specdict = SpecDict()
+        for spectrum in run:
+            if spectrum['ms level'] == 1:
+                specbasic = SpecBasic(spectrum['scan time'], spectrum['id'])
+                specdict[spectrum['scan time']] = specbasic
+        return run, specdict
+
+    def extractWithTime(self, time):
+        return self.specdict[time]
+
 
 
 def ExtractIonChrom(run):
@@ -110,4 +129,5 @@ def examples():
     #ExtractIonChrom(run)
 
 if __name__ == "__main__":
-    setup("./4tRNA1_102009.mzML")
+    exspec = ExtractSpec("./4tRNA1_102009.mzML")
+    exspec.extractWithTime(1)

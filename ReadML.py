@@ -52,8 +52,19 @@ class SpecBasic:
     def __str__(self):
         return "retention time: %s, index: %s" %(self._rt, self._idx)
 
-def SpecDict:
+def SpecDict(dict):
     def __init__(self):
+        pass
+    def __getattr__(self, time):
+        for self[int(time)]
+
+    def __setattr__(self, time, specbasic):
+        if not isinstance(specbasic, SpecBasic):
+            raise Exception("SpectDict only accept SpecBasic")
+        try:
+            self[int(time)].append(specbasic)
+        except:
+            self[int(time)] = [specbasic]
 
 def setup(filename):
     # set up basic data structure

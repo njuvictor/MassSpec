@@ -54,28 +54,31 @@ class SpecBasic:
         return "retention time: %s, index: %s" %(self._rt, self._idx)
 
 class SpecDict(dict):
-    def __getattr__(self, time):
+    def __init__(self):
+        self._dict = dict()
+
+    def __getitem__(self, time):
         if time.is_integer():
-            return self[int(time)]
+            return self._dict[int(time)]
         else:
             matchlist = []
             dec_len = len(str(time).split(".")[-1])
-            for specbasic in self[int(time)]:
+            for specbasic in self._dict[int(time)]:
                 if (specbasic.rtime - time) * 10 ** dec_len // 1 == 0:
                     matchlist.append(specbasic)
             return matchlist
 
 
-    def __setattr__(self, time, specbasic):
+    def __setitem__(self, time, specbasic):
         if not isinstance(specbasic, SpecBasic):
             raise Exception("SpectDict only accept SpecBasic")
         try:
-            self[int(time)].append(specbasic)
+            self._dict[int(time)].append(specbasic)
         except:
-            self[int(time)] = [specbasic]
+            self._dict[int(time)] = [specbasic]
 
     def __str__(self):
-        return "number of spec: %s" % (len(self.keys()))
+        return "number of spec: %s" % (len(self_dict.keys()))
 
 class ExtractSpec:
     def __init__(self, filename):

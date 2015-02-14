@@ -43,8 +43,8 @@ class SpecBasic:
         self._idx = index
 
     @property
-    def rtime(self, rtime):
-        self_rt = rtime
+    def rtime(self):
+        return self._rt
 
     @property
     def index(self, index):
@@ -58,7 +58,7 @@ class SpecDict(dict):
         self._dict = dict()
 
     def __getitem__(self, time):
-        if time.is_integer():
+        if float(time).is_integer():
             return self._dict[int(time)]
         else:
             matchlist = []
@@ -78,7 +78,7 @@ class SpecDict(dict):
             self._dict[int(time)] = [specbasic]
 
     def __str__(self):
-        return "number of spec: %s" % (len(self_dict.keys()))
+        return "number of spec: %s" % (len(self._dict.keys()))
 
 class ExtractSpec:
     def __init__(self, filename):
@@ -133,4 +133,12 @@ def examples():
 
 if __name__ == "__main__":
     exspec = ExtractSpec("./4tRNA1_102009.mzML")
-    exspec.extractWithTime(1)
+    # extract spectrums for specific time
+    specs  = exspec.extractWithTime(1)
+    print "for time 1"
+    for spec in specs:
+        print spec
+    specs  = exspec.extractWithTime(1.1)
+    print "for time 1.1"
+    for spec in specs:
+        print spec

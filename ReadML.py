@@ -3,24 +3,42 @@
 #
 import pymzml
 
-def GetNPeakbyMZRange(run, mzrange, n):
+def HighestPeaks(peaklist):
+    max_item= (0,0)
+    for eachitem in peaklist:
+        if eachitem[1] > max_item[1]:
+            max_item = eachitem
+    return max_item
+
+IGNORE_LIST = []
+def GetPeakbyMZRange(filename, mzrange, rtrange):
     # input is mzrange (a tuple), the output is the retention time, intensity of the peak
-    max_intensity = 0
-    n = 0
+
+    # for m mz values
+    #max_int_dict = dict()
+    #for eachmz in mzrange_list:
+    #    max_int_dict[eachmz] = {"max_int": 0}
+    run = pymzml.run.Reader(filename, noiseThreshold = 100)
     for spec in run:
-        n += 1
         try:
-            mz, intensity = spec.reduce(mzRange = mzrange).highestPeaks(1)[0]
-            print spec.reduce(mzRange = mzrange).highestPeaks(1)
-            break
+            rt_time = spec["scan time"]
+            if rt_time < rtrange[0]:
+                continue
+            elif rt_time > rtrange[1]:
+                print rt_time, spec["id"]
+                break
+        except:
+            continue
+        try:
+            mz, intensity = HighestPeaks(spec.reduce(mzRange = mzrange).peaks)
         except:
             continue
         if intensity > max_intensity:
             max_intensity = intensity
             max_mz = mz
             max_time = spec["scan time"]
-    print n
-    print (max_intensity, max_mz, max_time)
+            max_id   = spec["id"]
+    print (max_intensity, max_mz, max_time, max_id)
 
 
 def PlotRange(run):
@@ -91,6 +109,7 @@ class ExtractSpec:
         specdict = SpecDict()
         for spectrum in run:
             if spectrum['ms level'] == 1:
+                #print max(spectrum.i), min(spectrum.i)
                 specbasic = SpecBasic(spectrum['scan time'], spectrum['id'])
                 specdict[spectrum['scan time']] = specbasic
         return run, specdict
@@ -118,20 +137,29 @@ def ExtractIonChrom(run):
     for rt, i, mz in timeDependentIntensities:
         print('{0:5.3f} {1:13.4f}       {2:10}'.format( rt, i, mz ))
 
+def Test():
+    filename = "E165ug.mzML"
+    run = pymzml.run.Reader(filename)
+    print run[1701].extremeValues('i')
+    print run[1700].extremeValues('i')
+    print run[1702].extremeValues('i')
+    print run[1702].peaks
+
+
 
 def examples():
-    pass
     # first example
-    #run = pymzml.run.Reader("../E165ug.mzML", MSn_Precision = 250e-6)
-    #GetPeakbyMZRange(run, (1293.0, 1293.5))
-    # second example
-    #run = pymzml.run.Reader("../4tRNA1_102009.mzML", MSn_Precision = 250e-6)
-    #GetPeakbyMZRange(run, (1402.0, 1402.5))
-    #run = pymzml.run.Reader("./4tRNA1_102009.mzML", MSn_Precision = 250e-6)
-    #GetNPeakbyMZRange(run, (1403.0, 1403.3))
+    #run = pymzml.run.Reader("E165ug.mzML", noiseThreshold = 100, MSn_Precision = 250e-6)
+    #GetPeakbyMZRange("E165ug.mzML", (818.2, 818.7), (19.82, 20.34))
+    #GetPeakbyMZRange("E165ug.mzML", (819.2, 819.7), (19.82, 20.34))
+    GetPeakbyMZRange("E165ug.mzML", (818.2, 818.7), (15, 41))
+    GetPeakbyMZRange("E165ug.mzML", (819.2, 819.7), (15, 41))
+    GetPeakbyMZRange("E165ug.mzML", (1255.4, 1255.9), (15, 41))
+    GetPeakbyMZRange("E165ug.mzML", (1256.1, 1256.6), (15, 41))
+    #print Test()
     #ExtractIonChrom(run)
 
-if __name__ == "__main__":
+def ExtractTest():
     exspec = ExtractSpec("./4tRNA1_102009.mzML")
     # extract spectrums for specific time
     specs  = exspec.extractWithTime(1)
@@ -142,3 +170,6 @@ if __name__ == "__main__":
     print "for time 1.1"
     for spec in specs:
         print spec
+
+if __name__ == "__main__":
+    examples()

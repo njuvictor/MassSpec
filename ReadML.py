@@ -76,7 +76,7 @@ def MassToCharge(mass):
     return mz16, mz18
 
 def GetRT(mass, rtinterval):
-    rt = 0.0078 * mass + 9.3348
+    rt = 0.007 * mass + 8.3466
     rt1 = rt - rtinterval/2
     rt2 = rt + rtinterval/2
     return rt1, rt2
@@ -119,6 +119,7 @@ if __name__ == "__main__":
     root = Tkinter.Tk()
     root.withdraw()
     inputfile = tkFileDialog.askopenfilename()
+    #inputfile = "E165ug.mzML"
     masslist_raw  = raw_input('Please enter a list of mass splited by comma --> ')
     masslist  = masslist_raw.split(",")
     print masslist

@@ -18,6 +18,7 @@ def GetPeakbyMZRange(filename, mzrange, rtrange):
     #max_int_dict = dict()
     #for eachmz in mzrange_list:
     #    max_int_dict[eachmz] = {"max_int": 0}
+    max_intensity = 0
     run = pymzml.run.Reader(filename, noiseThreshold = 100)
     for spec in run:
         try:
@@ -152,10 +153,12 @@ def examples():
     #run = pymzml.run.Reader("E165ug.mzML", noiseThreshold = 100, MSn_Precision = 250e-6)
     #GetPeakbyMZRange("E165ug.mzML", (818.2, 818.7), (19.82, 20.34))
     #GetPeakbyMZRange("E165ug.mzML", (819.2, 819.7), (19.82, 20.34))
-    GetPeakbyMZRange("E165ug.mzML", (818.2, 818.7), (15, 41))
-    GetPeakbyMZRange("E165ug.mzML", (819.2, 819.7), (15, 41))
-    GetPeakbyMZRange("E165ug.mzML", (1255.4, 1255.9), (15, 41))
-    GetPeakbyMZRange("E165ug.mzML", (1256.1, 1256.6), (15, 41))
+    #GetPeakbyMZRange("E165ug.mzML", (818.2, 818.7), (15, 41))
+    #GetPeakbyMZRange("E165ug.mzML", (819.2, 819.7), (15, 41))
+    #GetPeakbyMZRange("E165ug.mzML", (1255.4, 1255.9), (15, 41))
+    #GetPeakbyMZRange("E165ug.mzML", (1256.1, 1256.6), (15, 41))
+    GetPeakbyMZRange("E165ug.mzML", (1365, 1365.2), (15, 41))
+    GetPeakbyMZRange("E165ug.mzML", (1365.6, 1365.8), (15, 41))
     #print Test()
     #ExtractIonChrom(run)
 

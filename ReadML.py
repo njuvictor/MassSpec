@@ -56,6 +56,31 @@ def PlotRange(run):
         p.save( filename="output/plotAspect.xhtml")
         break
 
+
+def MassToCharge(mass):
+    if mass>4000:
+        mz16= (mass- 3*1.007)/3
+        mz18 = ((mass+2)-3*1.007)/3
+    elif mass>2000:
+        mz16=(mass - 2*1.007)/2
+        mz18 = ((mass+2)-2*1.007)/2
+    else:
+        mz16= mass -1.007
+        mz18=  mass+2-*1.007
+    return mz16, mz18
+
+def GetRT(mass):
+    rt = 0.0078 * mass + 9.3348
+    rt1 = rt - 4
+    rt2 = rt + 4
+    return rt1, rt2
+
+def main():
+    inputmass = 43
+    mz16, mz18 = MassToCharge(inputmass)
+    r_time    = GetRT(inputmass)
+    GetPeakbyMZRange(inputfile, (mz16 - 0.2, mz16 + 0.2), (r_time - 10, r_time + 10))
+
 def Test():
     filename = "E165ug.mzML"
     run = pymzml.run.Reader(filename)

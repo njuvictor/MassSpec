@@ -1,8 +1,11 @@
 #
 #  Read ML file
 #
+
 import pymzml
 import Tkinter, tkFileDialog
+
+DEBUG = False
 
 def HighestPeaks(peaklist):
     max_item= (0,0)
@@ -64,7 +67,7 @@ def MassToCharge(mass):
     if mass > 4000:
         mz16 = (mass- 3*1.007)/3
         mz18 = ((mass+2)-3*1.007)/3
-    elif mass > 2000:
+    elif mass > 1300:
         mz16 = (mass - 2*1.007)/2
         mz18 = ((mass+2)-2*1.007)/2
     else:
@@ -80,11 +83,13 @@ def GetRT(mass, rtinterval):
 
 def main(inputfile, masslist):
     #inputmass  = 1638.8
-    rtinterval = 8
+    rtinterval = 6
     #rtinterval = 20
     for inputmass in masslist:
         mz16, mz18 = MassToCharge(inputmass)
         rt1 , rt2  = GetRT(inputmass, rtinterval)
+        #print mz16, mz18
+        #print rt1, rt2
         returndict = GetPeakbyMZRange(inputfile, [mz16, mz18], [rt1, rt2])
         for mass in returndict:
             print returndict[mass]["max_int"], returndict[mass]["max_mz"], returndict[mass]["max_time"], returndict[mass]["max_id"]
@@ -114,7 +119,7 @@ if __name__ == "__main__":
     root = Tkinter.Tk()
     root.withdraw()
     inputfile = tkFileDialog.askopenfilename()
-    #masslist_raw  = raw_input('Please enter a list of mass splited by comma --> ')
-    #masslist  = masslist_raw.split()
-    #main(inputfile, masslist)
-    main(inputfile, [1638.8])
+    masslist_raw  = raw_input('Please enter a list of mass splited by comma --> ')
+    masslist  = masslist_raw.split()
+    main(inputfile, map(float, masslist))
+    #main(inputfile, [1639.2])

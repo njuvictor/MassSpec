@@ -11,14 +11,17 @@ def HighestPeaks(peaklist):
             max_item = eachitem
     return max_item
 
+def SelectPeaks(peaks, mzRange):
+    return [ (mz,i) for mz, i in peaks if mzRange[0] <= mz <= mzRange[1] ]
+
 IGNORE_LIST = []
-def GetPeakbyMZRange(filename, mzrange, rtrange):
+def GetPeakbyMZRange(filename, mz_list, rtrange, tolerance = 0.2):
     # input is mzrange (a tuple), the output is the retention time, intensity of the peak
 
     # for m mz values
-    #max_int_dict = dict()
-    #for eachmz in mzrange_list:
-    #    max_int_dict[eachmz] = {"max_int": 0}
+    max_int_dict = dict()
+    for eachmz in mz_list:
+        max_int_dict[eachmz] = {"max_int": 0, "max_mz": None, "max_time": None, "max_id": None}
     max_intensity = 0
     run = pymzml.run.Reader(filename, noiseThreshold = 100)
     for spec in run:
@@ -27,20 +30,20 @@ def GetPeakbyMZRange(filename, mzrange, rtrange):
             if rt_time < rtrange[0]:
                 continue
             elif rt_time > rtrange[1]:
-                print rt_time, spec["id"]
                 break
         except:
             continue
-        try:
-            mz, intensity = HighestPeaks(spec.reduce(mzRange = mzrange).peaks)
-        except:
-            continue
-        if intensity > max_intensity:
-            max_intensity = intensity
-            max_mz = mz
-            max_time = spec["scan time"]
-            max_id   = spec["id"]
-    print (max_intensity, max_mz, max_time, max_id)
+        for eachmz in mz_list:
+            eachrange = (eachmz - tolerance, eachmz + tolerance)
+            try:
+                mz, intensity = HighestPeaks(SelectPeaks(spec.peaks, eachrange))
+            except Exception as e:
+                #print e.message
+                continue
+            max_intensity = max_int_dict[eachmz]["max_int"]
+            if intensity > max_intensity:
+                max_int_dict[eachmz] = {"max_int": intensity, "max_mz": mz, "max_time": spec["scan time"], "max_id": spec["id"]}
+    return max_int_dict
 
 
 def PlotRange(run):
@@ -58,28 +61,33 @@ def PlotRange(run):
 
 
 def MassToCharge(mass):
-    if mass>4000:
-        mz16= (mass- 3*1.007)/3
+    if mass > 4000:
+        mz16 = (mass- 3*1.007)/3
         mz18 = ((mass+2)-3*1.007)/3
-    elif mass>2000:
-        mz16=(mass - 2*1.007)/2
+    elif mass > 2000:
+        mz16 = (mass - 2*1.007)/2
         mz18 = ((mass+2)-2*1.007)/2
     else:
-        mz16= mass -1.007
-        mz18=  mass+2-*1.007
+        mz16 = mass -1.007
+        mz18 =  mass + 2 - 1.007
     return mz16, mz18
 
-def GetRT(mass):
+def GetRT(mass, rtinterval):
     rt = 0.0078 * mass + 9.3348
-    rt1 = rt - 4
-    rt2 = rt + 4
+    rt1 = rt - rtinterval/2
+    rt2 = rt + rtinterval/2
     return rt1, rt2
 
-def main():
-    inputmass = 43
-    mz16, mz18 = MassToCharge(inputmass)
-    r_time    = GetRT(inputmass)
-    GetPeakbyMZRange(inputfile, (mz16 - 0.2, mz16 + 0.2), (r_time - 10, r_time + 10))
+def main(inputfile, masslist):
+    #inputmass  = 1638.8
+    rtinterval = 8
+    #rtinterval = 20
+    for inputmass in masslist:
+        mz16, mz18 = MassToCharge(inputmass)
+        rt1 , rt2  = GetRT(inputmass, rtinterval)
+        returndict = GetPeakbyMZRange(inputfile, [mz16, mz18], [rt1, rt2])
+        for mass in returndict:
+            print returndict[mass]["max_int"], returndict[mass]["max_mz"], returndict[mass]["max_time"], returndict[mass]["max_id"]
 
 def Test():
     filename = "E165ug.mzML"
@@ -106,4 +114,7 @@ if __name__ == "__main__":
     root = Tkinter.Tk()
     root.withdraw()
     inputfile = tkFileDialog.askopenfilename()
-    examples(inputfile)
+    #masslist_raw  = raw_input('Please enter a list of mass splited by comma --> ')
+    #masslist  = masslist_raw.split()
+    #main(inputfile, masslist)
+    main(inputfile, [1638.8])

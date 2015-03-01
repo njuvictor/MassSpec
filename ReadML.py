@@ -120,6 +120,7 @@ if __name__ == "__main__":
     root.withdraw()
     inputfile = tkFileDialog.askopenfilename()
     masslist_raw  = raw_input('Please enter a list of mass splited by comma --> ')
-    masslist  = masslist_raw.split()
+    masslist  = masslist_raw.split(",")
+    print masslist
     main(inputfile, map(float, masslist))
     #main(inputfile, [1639.2])

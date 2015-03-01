@@ -2,6 +2,7 @@
 #  Read ML file
 #
 import pymzml
+import Tkinter, tkFileDialog
 
 def HighestPeaks(peaklist):
     max_item= (0,0)
@@ -148,17 +149,17 @@ def Test():
 
 
 
-def examples():
+def examples(inputfile):
     # first example
     #run = pymzml.run.Reader("E165ug.mzML", noiseThreshold = 100, MSn_Precision = 250e-6)
     #GetPeakbyMZRange("E165ug.mzML", (818.2, 818.7), (19.82, 20.34))
     #GetPeakbyMZRange("E165ug.mzML", (819.2, 819.7), (19.82, 20.34))
-    #GetPeakbyMZRange("E165ug.mzML", (818.2, 818.7), (15, 41))
-    #GetPeakbyMZRange("E165ug.mzML", (819.2, 819.7), (15, 41))
-    #GetPeakbyMZRange("E165ug.mzML", (1255.4, 1255.9), (15, 41))
-    #GetPeakbyMZRange("E165ug.mzML", (1256.1, 1256.6), (15, 41))
-    GetPeakbyMZRange("E165ug.mzML", (1365, 1365.2), (15, 41))
-    GetPeakbyMZRange("E165ug.mzML", (1365.6, 1365.8), (15, 41))
+    GetPeakbyMZRange(inputfile, (818.2, 818.7), (15, 41))
+    GetPeakbyMZRange(inputfile, (819.2, 819.7), (15, 41))
+    GetPeakbyMZRange(inputfile, (1255.4, 1255.9), (15, 41))
+    GetPeakbyMZRange(inputfile, (1256.1, 1256.6), (15, 41))
+    GetPeakbyMZRange(inputfile, (1365, 1365.2), (15, 41))
+    GetPeakbyMZRange(inputfile, (1365.6, 1365.8), (15, 41))
     #print Test()
     #ExtractIonChrom(run)
 
@@ -175,4 +176,7 @@ def ExtractTest():
         print spec
 
 if __name__ == "__main__":
-    examples()
+    root = Tkinter.Tk()
+    root.withdraw()
+    inputfile = tkFileDialog.askopenfilename()
+    examples(inputfile)
